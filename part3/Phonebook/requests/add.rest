@@ -1,0 +1,7 @@
+POST https://frozen-cliffs-64625.herokuapp.com/api/persons HTTP/1.1
+Content-type: application/json
+
+{
+    "name": "Joni44",
+    "number": "95959"
+}
