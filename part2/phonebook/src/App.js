@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState } from 'react'
 import Filter from './components/Filter'
 import Persons from './components/Persons'
@@ -13,7 +14,7 @@ const Notification = ({message}) => {
   return (
     <div className='success' > {message} </div>
   )}
-  if (message.includes("was already removed from server")) {
+  if (message.includes("Error")) {
     return (
     <div className='error' > {message} </div>
     )
@@ -26,7 +27,7 @@ const App = () => {
   const [persons, setPersons] = useState([])
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons')
+    axios.get('/api/persons')
       .then(response => {
         setPersons(response.data)
       })
@@ -78,6 +79,11 @@ const App = () => {
       }, 3600)
         setNewName("")
         setNewNumber("")
+      }).catch(error => {
+        setDisplayMessage('Error ' + error.response.data.error)
+        setTimeout(() => {
+        setDisplayMessage(null)
+      }, 3600)
       })
     } else 
       updateNumber(target[0].id, newName, newNumber)
@@ -93,7 +99,7 @@ const App = () => {
       })
       .catch(error => {
         setDisplayMessage(
-          `${name} was already removed from server`
+          `Error ${name} was already removed from server`
         )
         setTimeout(() => {
           setDisplayMessage(null)
@@ -116,7 +122,12 @@ const App = () => {
         setTimeout(() => {
         setDisplayMessage(null)
       }, 3600)
-      })
+      }).catch(error => {
+        setDisplayMessage('Error ' + error.response.data.error)
+        setTimeout(() => {
+        setDisplayMessage(null)
+      }, 3600)
+    })
     }
   }
 
