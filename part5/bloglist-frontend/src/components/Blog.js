@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import blogService from '../services/blogs'
 
 const Blog = ({ blog, user }) => {
@@ -13,6 +13,12 @@ const Blog = ({ blog, user }) => {
 
   const showDeleteButton = { display: isSameUser ? '' : 'none' }
 
+  useEffect(() => {
+    if (blog.user.username === user.username) {
+      setSameUser(true)
+    }
+  }, [])
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -22,10 +28,6 @@ const Blog = ({ blog, user }) => {
   }
   const handleClick = () => {
     setVisible(!visible)
-
-    if (blog.user.username === user.username) {
-      setSameUser(true)
-    }
   }
 
   const handleLikes = async (event) => {
@@ -46,14 +48,14 @@ const Blog = ({ blog, user }) => {
     }}
 
   return (
-    <div style={blogStyle}>
+    <div className='blogs' style={blogStyle}>
       <div style={hideWhenVisible}>
-        {blog.title} <button onClick={handleClick}> view </button>
+        {blog.title} by: {blog.author} <button onClick={handleClick}> view </button>
       </div>
       <div style={showWhenVisible}>
         {blog.title} <button onClick={handleClick}> hide </button>
         <div>{blog.url}</div>
-        <div>likes {likes} <button onClick={handleLikes}> like </button></div>
+        <div>likes {likes} <button onClick={handleLikes} placeholder='likebutton'> like </button></div>
         <div>{blog.author}</div>
         <div style={showDeleteButton }><button onClick={handleDelete}> remove </button></div>
       </div>
