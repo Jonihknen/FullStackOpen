@@ -69,8 +69,15 @@ blogsRouter.post('/',  middleware.userExtractor, async (request, response) => {
   }
 })
 
-blogsRouter.put('/:id', async (request, response) => {
-  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, request.body,
+blogsRouter.put('/:id',  middleware.userExtractor, async (request, response) => {
+  const body = request.body
+
+  const blog = {
+    ...body,
+    user: body.user.id
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog,
     { new: true })
   response.json(updatedBlog)
 })
