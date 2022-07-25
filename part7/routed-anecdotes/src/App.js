@@ -25,7 +25,7 @@ const Menu = ({anecdotes, addNew, handleNotification, notification}) => {
 
 
       <Routes>
-        <Route path="/notes/:id" element={<Anecdote anecdotes={anecdotes} />} />
+        <Route path="/anecdotes/:id" element={<Anecdote anecdotes={anecdotes} />} />
         <Route path="/createNew" element={<CreateNew addNew={addNew} handleNotification={handleNotification}/>} />
         <Route path="/about" element={<About />} />
         <Route path="/" element={<AnecdoteList anecdotes={anecdotes}/>} />
@@ -41,7 +41,7 @@ const AnecdoteList = ({anecdotes}) => {
     <ul>
       {anecdotes.map(anecdote =>
         <li key={anecdote.id}>
-          <Link to={`/notes/${anecdote.id}`}>{anecdote.content}</Link>
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
         </li>)}
     </ul>
   </div>
@@ -111,7 +111,6 @@ const CreateNew = ({addNew, handleNotification}) => {
     })
     navigate('/')
     handleNotification(`a new anecdote ${content} created!`)
-
   }
 
   return (
@@ -170,6 +169,8 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
+    console.log(anecdotes)
+
   }
 
   const anecdoteById = (id) =>
