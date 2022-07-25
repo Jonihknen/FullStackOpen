@@ -3,6 +3,8 @@ import {
   BrowserRouter as Router,
   Routes, Route, Link, useParams, useNavigate
 } from "react-router-dom"
+import  { useField } from './hooks'
+
 
 const Menu = ({anecdotes, addNew, handleNotification, notification}) => {
   const padding = {
@@ -94,42 +96,50 @@ const Footer = () => {
   ) }
 
 const CreateNew = ({addNew, handleNotification}) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+
   const navigate = useNavigate()
 
-
+  const {reset : reset1, ...content} = useField('text')
+  const {reset : reset2, ...info} = useField('text')
+  const {reset : reset3, ...author} = useField('text')
 
   const handleSubmit = (e) => {
+
     e.preventDefault()
     addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
     navigate('/')
-    handleNotification(`a new anecdote ${content} created!`)
+    handleNotification(`a new anecdote ${content.value} created!`)
+  }
+  const handleReset = (event) => {
+    event.preventDefault()
+    reset1()
+    reset2()
+    reset3()
   }
 
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input {...content}/> 
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input {...author}/>
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input {...info}/> 
         </div>
-        <button>create</button>
+        <button onClick={handleSubmit}>create</button>
+        <button onClick={handleReset}>reset</button>
       </form>
     </div>
   )
@@ -169,7 +179,6 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
-    console.log(anecdotes)
 
   }
 
