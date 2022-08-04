@@ -1,9 +1,12 @@
 /* eslint-disable import/no-anonymous-default-export */
+import axios from 'axios'
+const baseUrl = '/api/users'
+
 let token = null
 
 const STORAGE_KEY = 'loggedBlogAppUser'
 
-const setUser = (user) => {
+const setUser = user => {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
   token = user.token
 }
@@ -19,6 +22,16 @@ const getUser = () => {
   return null
 }
 
+const getAll = async () => {
+  const response = await axios.get(baseUrl)
+  return response.data
+}
+
+const getByID = async id => {
+  const response = await axios.get(`baseUrl/${id}`)
+  return response.data
+}
+
 const clearUser = () => {
   localStorage.clear()
   token = null
@@ -30,5 +43,7 @@ export default {
   setUser,
   getUser,
   clearUser,
-  getToken
+  getToken,
+  getAll,
+  getByID
 }

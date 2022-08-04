@@ -12,11 +12,10 @@ const BlogDetails = ({ blog, visible, likeBlog, removeBlog, own }) => {
         <a href={blog.url}>{blog.url}</a>
       </div>
       <div>
-        {blog.likes} likes{' '}
-        <button onClick={() => likeBlog(blog.id)}>like</button>
+        {blog.likes} likes <button onClick={() => likeBlog(blog)}>like</button>
       </div>
       {addedBy}
-      {own && <button onClick={() => removeBlog(blog.id)}>remove</button>}
+      {own && <button onClick={() => removeBlog(blog)}>remove</button>}
     </div>
   )
 }
@@ -28,7 +27,7 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
     padding: 3,
     margin: 5,
     borderStyle: 'solid',
-    borderWidth: 1,
+    borderWidth: 1
   }
 
   return (
@@ -56,14 +55,14 @@ Blog.propTypes = {
     likes: PropTypes.number.isRequired,
     user: PropTypes.shape({
       username: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    }),
+      name: PropTypes.string.isRequired
+    })
   }).isRequired,
   user: PropTypes.shape({
-    username: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired
   }),
   likeBlog: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired,
+  removeBlog: PropTypes.func.isRequired
 }
 
 export default Blog

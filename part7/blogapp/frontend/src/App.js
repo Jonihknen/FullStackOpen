@@ -1,31 +1,50 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+import Users from './components/Users'
+import User from './components/User'
 
-import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/user'
 
+import { useDispatch, useSelector } from 'react-redux'
+import { addNotification } from './reducers/notificationReducer'
+import {
+  initializeBlogs,
+  newblog,
+  likeBlogRedux,
+  deleteBlog
+} from './reducers/blogReducer'
+import { setUser, removeUser } from './reducers/userReducer'
+import { initializeUsers } from './reducers/usersReducer'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState(null)
+  const user = useSelector(state => state.user)
+  const notification = useSelector(state => state.notification)
+
+  let blogs = useSelector(state => state.blogs)
+
   const blogFormRef = useRef()
-  const byLikes = (b1, b2) => (b2.likes > b1.likes ? 1 : -1)
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs.sort(byLikes)))
+    dispatch(initializeBlogs())
+    dispatch(initializeUsers())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     const userFromStorage = userService.getUser()
     if (userFromStorage) {
-      setUser(userFromStorage)
+      dispatch(setUser(userFromStorage))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const login = async (username, password) => {
@@ -34,9 +53,8 @@ const App = () => {
         username,
         password
       })
-      .then((user) => {
-        setUser(user)
-        userService.setUser(user)
+      .then(user => {
+        dispatch(setUser(user))
         notify(`${user.name} logged in!`)
       })
       .catch(() => {
@@ -45,65 +63,37 @@ const App = () => {
   }
 
   const logout = () => {
-    setUser(null)
+    dispatch(removeUser())
     userService.clearUser()
     notify('good bye!')
   }
 
-  const createBlog = async (blog) => {
-    blogService
-      .create(blog)
-      .then((createdBlog) => {
-        notify(
-          `a new blog '${createdBlog.title}' by ${createdBlog.author} added`
-        )
-        setBlogs(blogs.concat(createdBlog))
+  const createBlog = async blog => {
+    await dispatch(newblog(blog))
+      .then(b => {
+        notify(`a new blog '${blog.title}' by ${blog.author} added`)
         blogFormRef.current.toggleVisibility()
       })
-      .catch((error) => {
-        notify('creating a blog failed: ' + error.response.data.error, 'alert')
+      .catch(error => {
+        notify('creating a blog failed: ' + error, 'alert')
       })
   }
 
-  const removeBlog = (id) => {
-    const toRemove = blogs.find((b) => b.id === id)
-
-    const ok = window.confirm(
-      `remove '${toRemove.title}' by ${toRemove.author}?`
-    )
-
+  const removeBlog = blog => {
+    const ok = window.confirm(`remove '${blog.title}' by ${blog.author}?`)
     if (!ok) {
       return
     }
-
-    blogService.remove(id).then(() => {
-      const updatedBlogs = blogs.filter((b) => b.id !== id).sort(byLikes)
-      setBlogs(updatedBlogs)
-    })
+    dispatch(deleteBlog(blog.id))
   }
 
-  const likeBlog = async (id) => {
-    const toLike = blogs.find((b) => b.id === id)
-    const liked = {
-      ...toLike,
-      likes: (toLike.likes || 0) + 1,
-      user: toLike.user.id
-    }
-
-    blogService.update(liked.id, liked).then((updatedBlog) => {
-      notify(`you liked '${updatedBlog.title}' by ${updatedBlog.author}`)
-      const updatedBlogs = blogs
-        .map((b) => (b.id === id ? updatedBlog : b))
-        .sort(byLikes)
-      setBlogs(updatedBlogs)
-    })
+  const likeBlog = async blog => {
+    await dispatch(likeBlogRedux(blog))
+    notify(`you liked '${blog.title}' by ${blog.author}`)
   }
 
   const notify = (message, type = 'info') => {
-    setNotification({ message, type })
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
+    dispatch(addNotification(message, type))
   }
 
   if (user === null) {
@@ -114,34 +104,57 @@ const App = () => {
       </>
     )
   }
-
+  const padding = {
+    padding: 5
+  }
   return (
-    <div>
-      <h2>blogs</h2>
-
-      <Notification notification={notification} />
-
+    <Router>
       <div>
-        {user.name} logged in
-        <button onClick={logout}>logout</button>
-      </div>
+        <div>
+          <Link to="/blogs">blogs</Link>
+          <Link style={padding} to="/users">
+            users
+          </Link>
+          {user.name} logged in
+          <button style={padding} onClick={logout}>
+            logout
+          </button>
+        </div>
 
-      <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <NewBlogForm onCreate={createBlog} />
-      </Togglable>
-
-      <div id="blogs">
-        {blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            likeBlog={likeBlog}
-            removeBlog={removeBlog}
-            user={user}
+        <Routes>
+          <Route
+            path="/blogs"
+            element={
+              <div>
+                <Notification notification={notification} />
+                <h2>blog app</h2>
+                <div>
+                  {
+                    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                      <NewBlogForm onCreate={createBlog} />
+                    </Togglable>
+                  }
+                </div>
+                <div id="blogs">
+                  {blogs.map(blog => (
+                    <Blog
+                      key={blog.id}
+                      blog={blog}
+                      likeBlog={likeBlog}
+                      removeBlog={removeBlog}
+                      user={user}
+                    />
+                  ))}
+                </div>
+              </div>
+            }
           />
-        ))}
+          <Route path="/users" element={<Users />} />
+          <Route path="/users/:userId" element={<User />} />
+          <Route path="/" element={'Helloo'} />
+        </Routes>
       </div>
-    </div>
+    </Router>
   )
 }
 
