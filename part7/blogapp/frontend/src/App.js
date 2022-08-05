@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 
+import Blogs from './components/Blogs'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import NewBlogForm from './components/NewBlogForm'
@@ -23,11 +24,11 @@ import { setUser, removeUser } from './reducers/userReducer'
 import { initializeUsers } from './reducers/usersReducer'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
+import { Nav, Navbar } from 'react-bootstrap'
+
 const App = () => {
   const user = useSelector(state => state.user)
   const notification = useSelector(state => state.notification)
-
-  let blogs = useSelector(state => state.blogs)
 
   const blogFormRef = useRef()
 
@@ -85,6 +86,7 @@ const App = () => {
       return
     }
     dispatch(deleteBlog(blog.id))
+    notify(`${blog.title} by ${blog.author} deleted`)
   }
 
   const likeBlog = async blog => {
@@ -100,26 +102,46 @@ const App = () => {
     return (
       <>
         <Notification notification={notification} />
-        <LoginForm onLogin={login} />
+        <LoginForm onLogin={login} notification={notification} />
       </>
     )
   }
   const padding = {
     padding: 5
   }
+  const style = {
+    backgroundColor: '#e1e3e3'
+  }
   return (
     <Router>
-      <div>
-        <div>
-          <Link to="/blogs">blogs</Link>
-          <Link style={padding} to="/users">
-            users
-          </Link>
-          {user.name} logged in
-          <button style={padding} onClick={logout}>
-            logout
-          </button>
-        </div>
+      <div className="container-fluid" style={style}>
+        <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Collapse id="responsive-navbar-nav">
+            <Nav className="mr-auto">
+              <Nav.Link href="#" as="span">
+                <Link style={padding} to="/blogs">
+                  blogs
+                </Link>
+              </Nav.Link>
+              <Nav.Link href="#" as="span">
+                <Link style={padding} to="/users">
+                  users
+                </Link>
+              </Nav.Link>
+              <Nav.Link href="#" as="span">
+                {user.name} logged in{' '}
+              </Nav.Link>
+              <button
+                className="btn btn-outline-success my-2 my-sm-0"
+                onClick={logout}
+              >
+                {' '}
+                logout
+              </button>
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
 
         <Routes>
           <Route
@@ -135,22 +157,26 @@ const App = () => {
                     </Togglable>
                   }
                 </div>
-                <div id="blogs">
-                  {blogs.map(blog => (
-                    <Blog
-                      key={blog.id}
-                      blog={blog}
-                      likeBlog={likeBlog}
-                      removeBlog={removeBlog}
-                      user={user}
-                    />
-                  ))}
+                <div>
+                  <Blogs />
                 </div>
               </div>
             }
           />
           <Route path="/users" element={<Users />} />
           <Route path="/users/:userId" element={<User />} />
+          <Route
+            path="/blogs/:blogId"
+            element={
+              <div>
+                <div>
+                  {' '}
+                  <Notification notification={notification} />
+                </div>
+                <Blog addLike={likeBlog} removeBlog={removeBlog} />
+              </div>
+            }
+          />
           <Route path="/" element={'Helloo'} />
         </Routes>
       </div>

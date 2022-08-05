@@ -1,68 +1,61 @@
-import { useState } from 'react'
-import PropTypes from 'prop-types'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import Comment from './Comment'
 
-const BlogDetails = ({ blog, visible, likeBlog, removeBlog, own }) => {
-  if (!visible) return null
-
-  const addedBy = blog.user && blog.user.name ? blog.user.name : 'anonymous'
-
-  return (
-    <div>
-      <div>
-        <a href={blog.url}>{blog.url}</a>
-      </div>
-      <div>
-        {blog.likes} likes <button onClick={() => likeBlog(blog)}>like</button>
-      </div>
-      {addedBy}
-      {own && <button onClick={() => removeBlog(blog)}>remove</button>}
-    </div>
+const Blog = ({ addLike, removeBlog }) => {
+  let { blogId } = useParams()
+  const blog = useSelector(state =>
+    state.blogs.find(blog => blog.id === blogId)
   )
-}
+  const navigate = useNavigate()
 
-const Blog = ({ blog, likeBlog, removeBlog, user }) => {
-  const [visible, setVisible] = useState(false)
+  const loggedUser = useSelector(state => state.user.username)
 
-  const style = {
-    padding: 3,
-    margin: 5,
-    borderStyle: 'solid',
-    borderWidth: 1
+  let removeButtonVisible
+  if (blog) {
+    removeButtonVisible = {
+      display: blog.user.username === loggedUser ? '' : 'none'
+    }
   }
 
-  return (
-    <div style={style} className="blog">
-      <b>{blog.title}</b> by: {blog.author}
-      <button onClick={() => setVisible(!visible)}>
-        {visible ? 'hide' : 'view'}
-      </button>
-      <BlogDetails
-        blog={blog}
-        visible={visible}
-        likeBlog={likeBlog}
-        removeBlog={removeBlog}
-        own={blog.user && user.username === blog.user.username}
-      />
-    </div>
-  )
-}
-
-Blog.propTypes = {
-  blog: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    author: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    likes: PropTypes.number.isRequired,
-    user: PropTypes.shape({
-      username: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  }).isRequired,
-  user: PropTypes.shape({
-    username: PropTypes.string.isRequired
-  }),
-  likeBlog: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired
+  if (blog) {
+    return (
+      <div>
+        <h1>{blog.title}</h1>
+        <div>
+          <a href={blog.url}>{blog.url}</a>
+        </div>
+        <div>
+          {blog.likes} likes{' '}
+          <button
+            onClick={function () {
+              addLike(blog)
+            }}
+          >
+            {' '}
+            like
+          </button>
+        </div>
+        <div>added by {blog.user.name} </div>
+        <button
+          style={removeButtonVisible}
+          onClick={function () {
+            removeBlog(blog)
+            navigate('/blogs')
+          }}
+        >
+          delete blog
+        </button>
+        <div>
+          <h2>comments</h2>
+        </div>
+        <div>
+          <Comment blog={blog} />
+        </div>
+      </div>
+    )
+  }
+  return <div>No blog found</div>
 }
 
 export default Blog
