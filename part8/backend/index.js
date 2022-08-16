@@ -19,9 +19,9 @@ const jwt = require('jsonwebtoken')
 const JWT_SECRET = 'lippalakki'
 
 const MONGODB_URI =
-  'mongodb+srv://fullstack:czjesg8p@cluster0.ivem5.mongodb.net/?retryWrites=true&w=majority'
+  // 'mongodb+srv://fullstack: password p@cluster0.ivem5.mongodb.net/?retryWrites=true&w=majority'
 
-console.log('connecting to', MONGODB_URI)
+  console.log('connecting to', MONGODB_URI)
 
 mongoose
   .connect(MONGODB_URI)
