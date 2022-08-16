@@ -32,7 +32,7 @@ const Authors = ({ show, authors }) => {
               <th>books</th>
             </tr>
             {authors.map((a) => (
-              <tr key={a.id}>
+              <tr key={a.name}>
                 <td
                   onClick={function () {
                     setName(a.name)
