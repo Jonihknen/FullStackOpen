@@ -11,6 +11,7 @@ interface ExerciseValues {
   exerciseList: Array<number>;
   targetNumber: number;
 }
+/*
 const parseInput = (args: Array<string>): ExerciseValues => {
   const numList = args.slice(2).map((str) => Number(str));
   const target: number = numList.shift()!;
@@ -26,6 +27,22 @@ const parseInput = (args: Array<string>): ExerciseValues => {
   } else {
     throw new Error("Provided values were not numbers!");
   }
+}; */
+
+export const dataParser = (
+  target: number,
+  exerciseList: Array<number>
+): ExerciseValues => {
+  console.log(exerciseList.every((elem) => isNaN(elem)));
+  console.log(exerciseList.some(isNaN));
+
+  if (isNaN(target) || exerciseList.some(isNaN)) {
+    throw new Error("malformatted parameters");
+  } else
+    return {
+      targetNumber: target,
+      exerciseList: exerciseList,
+    };
 };
 
 const calculateExercises = (
@@ -57,7 +74,7 @@ const calculateExercises = (
   return Result;
 };
 
-try {
+/* try {
   const { exerciseList, targetNumber } = parseInput(process.argv);
   console.log(calculateExercises(exerciseList, targetNumber));
 } catch (error: unknown) {
@@ -66,4 +83,6 @@ try {
     errorMessage += " Error: " + error.message;
   }
   console.log(errorMessage);
-}
+} */
+
+export { calculateExercises };
