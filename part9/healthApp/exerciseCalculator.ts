@@ -11,7 +11,7 @@ interface ExerciseValues {
   exerciseList: Array<number>;
   targetNumber: number;
 }
-/*
+
 const parseInput = (args: Array<string>): ExerciseValues => {
   const numList = args.slice(2).map((str) => Number(str));
   const target: number = numList.shift()!;
@@ -27,7 +27,7 @@ const parseInput = (args: Array<string>): ExerciseValues => {
   } else {
     throw new Error("Provided values were not numbers!");
   }
-}; */
+};
 
 export const dataParser = (
   target: number,
@@ -74,7 +74,7 @@ const calculateExercises = (
   return Result;
 };
 
-/* try {
+try {
   const { exerciseList, targetNumber } = parseInput(process.argv);
   console.log(calculateExercises(exerciseList, targetNumber));
 } catch (error: unknown) {
@@ -83,6 +83,6 @@ const calculateExercises = (
     errorMessage += " Error: " + error.message;
   }
   console.log(errorMessage);
-} */
+}
 
 export { calculateExercises };

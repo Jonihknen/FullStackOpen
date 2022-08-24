@@ -1,9 +1,9 @@
-/* interface HeightWeight {
+interface HeightWeight {
   height: number;
   weight: number;
-} */
+}
 
-/* const parseArguments = (args: Array<string>): HeightWeight => {
+const parseArguments = (args: Array<string>): HeightWeight => {
   if (args.length < 4) throw new Error("Not enough arguments");
   if (args.length > 4) throw new Error("Too many arguments");
 
@@ -15,7 +15,7 @@
   } else {
     throw new Error("Provided values were not numbers!");
   }
-}; */
+};
 let result: string;
 
 const calculate = (height: number, weight: number) => {
@@ -44,7 +44,7 @@ const calculate = (height: number, weight: number) => {
   };
 };
 
-/* try {
+try {
   const { height, weight } = parseArguments(process.argv);
   calculate(height, weight);
 } catch (error: unknown) {
@@ -53,5 +53,5 @@ const calculate = (height: number, weight: number) => {
     errorMessage += " Error: " + error.message;
   }
   console.log(errorMessage);
-} */
+}
 export { calculate };
