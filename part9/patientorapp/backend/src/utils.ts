@@ -1,5 +1,4 @@
-import { parse } from "dotenv";
-import { newPatientEntry, Gender } from "./types";
+import { newPatientEntry, Gender, Entry, EntryWithoutId } from "./types";
 
 const isString = (text: unknown): text is string => {
   return typeof text === "string" || text instanceof String;
@@ -9,7 +8,9 @@ const isDate = (date: string): boolean => {
   return Boolean(Date.parse(date));
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isGender = (param: any): param is Gender => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return Object.values(Gender).includes(param);
 };
 
@@ -33,6 +34,16 @@ const parseGender = (gender: unknown): Gender => {
   }
   return gender;
 };
+const isEntries = (entries: unknown[]): entries is Entry[] => {
+  return true;
+};
+
+const parseEntries = (entries: unknown[]): Entry[] => {
+  if (!entries || !isEntries(entries)) {
+    throw new Error("Incorrect or missing entries");
+  }
+  return entries;
+};
 
 type Fields = {
   name: unknown;
@@ -40,6 +51,7 @@ type Fields = {
   gender: unknown;
   ssn: unknown;
   dateOfBirth: unknown;
+  entries: unknown[];
 };
 
 const toNewPatientEntry = ({
@@ -48,6 +60,7 @@ const toNewPatientEntry = ({
   gender,
   ssn,
   dateOfBirth,
+  entries,
 }: Fields): newPatientEntry => {
   const newEntry: newPatientEntry = {
     name: parseStringData(name),
@@ -55,9 +68,43 @@ const toNewPatientEntry = ({
     gender: parseGender(gender),
     ssn: parseStringData(ssn),
     dateOfBirth: parseDate(dateOfBirth),
+    entries: parseEntries(entries),
   };
 
   return newEntry;
 };
 
-export default toNewPatientEntry;
+const toNewEntry = (entry: Entry): EntryWithoutId => {
+  const shared = {
+    date: parseDate(entry.date),
+    description: parseStringData(entry.description),
+    specialist: parseStringData(entry.specialist),
+    diagnosisCodes: entry.diagnosisCodes,
+  };
+
+  switch (entry.type) {
+    case "HealthCheck":
+      return {
+        ...shared,
+        healthCheckRating: entry.healthCheckRating,
+        type: entry.type,
+      };
+    case "Hospital":
+      return {
+        ...shared,
+        type: entry.type,
+        discharge: entry.discharge,
+      };
+    case "OccupationalHealthcare":
+      return {
+        ...shared,
+        employerName: parseStringData(entry.employerName),
+        sickLeave: entry.sickLeave,
+        type: entry.type,
+      };
+    default:
+      throw new Error("something went wrong in entry typecheck");
+  }
+};
+
+export { toNewPatientEntry, toNewEntry };

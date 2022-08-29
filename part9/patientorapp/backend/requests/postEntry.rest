@@ -1,0 +1,18 @@
+POST http://localhost:3001/api/patients/d2773c6e-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+"type": "HealthCheck", 
+"date": "2000-11-11", 
+"description": "testrun",
+"specialist": "joni",
+"healthCheckRating": 0
+}
+
+{
+"type": "Hospital", 
+"date": "2000-11-11", 
+"description": "testrun",
+"diagnosisCodes": ["S62.5","Z57.1","Z74.3","M51.2"],
+"specialist": "joni"
+}

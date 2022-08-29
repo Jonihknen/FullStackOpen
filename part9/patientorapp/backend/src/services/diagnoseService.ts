@@ -1,10 +1,11 @@
 import diagnoseData from "../../data/diagnoses";
 
-import { Diagnose } from "../types";
+import { Diagnosis } from "../types";
 
-const diagnoses: Array<Diagnose> = diagnoseData;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const diagnoses: Array<Diagnosis> = diagnoseData;
 
-const getEntries = (): Array<Diagnose> => {
+const getEntries = (): Array<Diagnosis> => {
   return diagnoses;
 };
 
